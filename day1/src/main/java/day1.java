@@ -7,7 +7,7 @@ public class day1 {
 
     public static void main(String[] args) {
 
-        ArrayList<Integer> inventory = new ArrayList<Integer>();
+        ArrayList<Integer> inventory = new ArrayList<>();
         try {
             File myObj = new File("/Users/cbeam/GIT/advent2022/day1/src/main/resources/day1input.txt");
             Scanner myReader = new Scanner(myObj);
@@ -28,7 +28,7 @@ public class day1 {
             System.out.println(e.getMessage());
 
         }
-        Collections.sort(inventory, Collections.reverseOrder());
+        inventory.sort(Collections.reverseOrder());
         System.out.println("Elf with the most: " + inventory.get(0));
         System.out.println("Total top 3 elves: " + (inventory.get(0) + inventory.get(1) + inventory.get(2)));
     }
