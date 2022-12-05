@@ -7,7 +7,7 @@ public class Day2 {
         int part1Score = 0;
         int part2Score = 0;
         try {
-            File myObj = new File("/Users/cbeam/GIT/advent2022/day2/src/main/resources/day2input.txt");
+            File myObj = new File("day2/src/main/resources/day2input.txt");
             Scanner myReader = new Scanner(myObj);
 
 

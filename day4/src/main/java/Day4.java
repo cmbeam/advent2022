@@ -9,7 +9,7 @@ public class Day4 {
         int partialTotal = 0;
 
         try {
-            File myObj = new File("/Users/cbeam/GIT/advent2022/day4/src/main/resources/day4input.txt");
+            File myObj = new File("day4/src/main/resources/day4input.txt");
             Scanner myReader = new Scanner(myObj);
 
             while (myReader.hasNextLine()) {

@@ -9,7 +9,7 @@ public class Day1 {
 
         ArrayList<Integer> inventory = new ArrayList<>();
         try {
-            File myObj = new File("/Users/cbeam/GIT/advent2022/day1/src/main/resources/day1input.txt");
+            File myObj = new File("day1/src/main/resources/day1input.txt");
             Scanner myReader = new Scanner(myObj);
 
             int tally = 0;

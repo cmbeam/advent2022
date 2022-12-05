@@ -8,7 +8,7 @@ public class Day3 {
         int total = 0;
         int badgeTotal = 0;
         try {
-            File myObj = new File("/Users/cbeam/GIT/advent2022/day3/src/main/resources/day3input.txt");
+            File myObj = new File("day3/src/main/resources/day3input.txt");
             Scanner myReader = new Scanner(myObj);
 
             int groupCount = 1;
