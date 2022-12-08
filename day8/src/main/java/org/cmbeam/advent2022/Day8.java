@@ -16,7 +16,7 @@ public class Day8
         ArrayList<ArrayList<Integer>> columns = new ArrayList<>();
 
         try {
-            File myObj = new File("day8/src/main/resources/day8sample.txt");
+            File myObj = new File("day8/src/main/resources/day8input.txt");
             Scanner myReader = new Scanner(myObj);
 
             int rowNumber = 0;
@@ -76,13 +76,10 @@ public class Day8
                 int scenicTallest = -1;
                 for (int j = i - 1; j >= 0 ; j--) {
                     //System.out.println("DOWN: i: " + row.get(i) + " j: " + row.get(j));
-                    if(row.get(i) >= row.get(j)&& row.get(j) > scenicTallest){
-                        if(row.get(j) > scenicTallest)
-                            scenicTallest = row.get(j);
+                    if(row.get(i) > row.get(j)){
                         vizCount++;
                     }
                     else{
-                        if(row.get(j) >= scenicTallest)
                             vizCount++;
                         break;
                     }
@@ -111,13 +108,10 @@ public class Day8
                 int scenicTallest = -1;
                 for (int j = i + 1; j < row.size() ; j++) {
                    // System.out.println("UP: i: " + row.get(i) + " j: " + row.get(j));
-                    if(row.get(i) >= row.get(j)&& row.get(j) > scenicTallest){
-                        if(row.get(j) > scenicTallest)
-                            scenicTallest = row.get(j);
+                    if(row.get(i) > row.get(j)){
                         vizCount++;
                     }
                     else{
-                        if(row.get(j) >= scenicTallest)
                             vizCount++;
                         break;
                     }
@@ -147,13 +141,10 @@ public class Day8
                 int vizCount = 0;
                 int scenicTallest = -1;
                 for (int j = i - 1; j >= 0 ; j--) {
-                    if(column.get(i) >= column.get(j) && column.get(j) > scenicTallest){
-                        if(column.get(j) > scenicTallest)
-                            scenicTallest = column.get(j);
+                    if(column.get(i) > column.get(j)){
                         vizCount++;
                     }
                     else{
-                        if(column.get(j) >= scenicTallest)
                             vizCount++;
                         break;
                     }
@@ -173,14 +164,11 @@ public class Day8
                 int vizCount = 0;
                 int scenicTallest = -1;
                 for (int j = i + 1; j < column.size() ; j++) {
-                    if(column.get(i) >= column.get(j) && column.get(j) > scenicTallest){
-                        if(column.get(j) > scenicTallest)
-                            scenicTallest = column.get(j);
+                    if(column.get(i) > column.get(j)){
                         vizCount++;
                     }
                     else{
-                        if(column.get(j) >= scenicTallest)
-                            vizCount++;
+                        vizCount++;
                         break;
                     }
                 }
