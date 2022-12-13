@@ -14,7 +14,7 @@ public class Day4 {
 
             while (myReader.hasNextLine()) {
                 String entry = myReader.next();
-                //System.out.println(entry);
+                System.out.println(entry);
                 String[] assignments = entry.split(",");
                 String[] assignment1 = assignments[0].split("-");
                 String[] assignment2 = assignments[1].split("-");
