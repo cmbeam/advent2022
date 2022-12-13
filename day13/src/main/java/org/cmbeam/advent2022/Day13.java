@@ -6,16 +6,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Day13 {
     public static void main(String[] args) {
         List<Node> packets = new ArrayList<>();
         try {
-            File myObj = new File("day13/src/main/resources/day13sample.txt");
+            File myObj = new File("day13/src/main/resources/day13input.txt");
             Scanner myReader = new Scanner(myObj);
 
             while (myReader.hasNextLine()) {
@@ -38,7 +35,7 @@ public class Day13 {
             Node nodeR = packets.get(i+1);
             System.out.println("Node L: " + nodeL.toString());
             System.out.println("Node R: " + nodeR.toString());
-            if(compare(nodeL, nodeR) >= 0){
+            if(compare(nodeL, nodeR) < 0){
                 inOrderList.add(i/2 + 1);
             }
         }
@@ -49,8 +46,36 @@ public class Day13 {
              ) {
             sum += indice;
         }
-        System.out.println("Sum: " + sum);
+        System.out.println("Sum Part 1: " + sum);
+        System.out.println();
 
+        try {
+            Node node = parsePacket(new StringReader("[[2]]"));
+            packets.add(node);
+            node = parsePacket(new StringReader("[[6]]"));
+            packets.add(node);
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
+//        System.out.println("Before: ");
+//        for (Node node:packets
+//             ) {
+//            System.out.println(node.toString());
+//        }
+        Collections.sort(packets);
+//        System.out.println("After: ");
+        int decoderProduct = 1;
+        int index = 1;
+        for (Node node:packets
+        ) {
+            if(node.toString().equals("((6))") || node.toString().equals("((2))"))
+                decoderProduct = decoderProduct * index;
+            System.out.println(node.toString());
+            index++;
+        }
+        System.out.println("Answer part 2: " + decoderProduct);
     }
 
     public static Node parsePacket(Reader in) throws IOException {
@@ -143,7 +168,7 @@ public class Day13 {
         }
 
     }
-    public static abstract class Node {
+    public static abstract class Node implements Comparable {
     }
 
     public static class NumberNode extends Node {
@@ -158,7 +183,10 @@ public class Day13 {
             return Integer.toString(number);
         }
 
-
+        @Override
+        public int compareTo(Object o) {
+            return compare(this, (NumberNode) o);
+        }
     }
 
     public static class ListNode extends Node {
@@ -168,6 +196,9 @@ public class Day13 {
             list.addAll(nodes);
         }
 
+        public int size(){
+            return list.size();
+        }
         @Override
         public String toString() {
             StringBuilder buf = new StringBuilder();
@@ -185,8 +216,50 @@ public class Day13 {
             return buf.toString();
         }
 
+        @Override
+        public int compareTo(Object o) {
+            return compare(this, (ListNode) o);
+        }
+
     }
     public static int compare(Node l, Node r){
+        if (l instanceof NumberNode  && r instanceof NumberNode) {
+            if (((NumberNode) l).number < ((NumberNode) r).number)
+                return -1;
+            else if(((NumberNode) l).number > ((NumberNode) r).number)
+                return 1;
+            else
+                return 0;
+        }
+        if (l instanceof ListNode  && r instanceof ListNode) {
+            for (int i = 0; i < ((ListNode) l).size() && i < ((ListNode) r).size() ; i++) {
+                if(compare(((ListNode) l).list.get(i), ((ListNode) r).list.get(i) ) < 0){
+                    return -1;
+                }
+                if(compare(((ListNode) l).list.get(i), ((ListNode) r).list.get(i) ) > 0){
+                    return 1;
+                }
+            }
+            if (((ListNode) l).size() < ((ListNode) r).size())
+                return -1;
+            else if (((ListNode) l).size() > ((ListNode) r).size())
+                return 1;
+            else
+                return 0;
+        }
+        if(l instanceof NumberNode){
+            List<Node> nodes = new ArrayList<>();
+            nodes.add(l);
+            ListNode newLNode = new ListNode(nodes);
+            return compare(newLNode, r);
+        }
+        if(r instanceof NumberNode){
+            List<Node> nodes = new ArrayList<>();
+            nodes.add(r);
+            ListNode newRNode = new ListNode(nodes);
+            return compare(l, newRNode);
+        }
+
         return 0;
     }
 }
