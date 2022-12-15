@@ -1,0 +1,217 @@
+
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Scanner;
+
+class Scratch {
+    public static void main(String[] args) {
+        int ROW=2000000;
+
+        List<Sensor> sensors = new ArrayList<>();
+        int maxX = 0;
+        int maxY = 0;
+        int minX = 0;
+        int minY = 0;
+        try {
+            File myObj = new File("C:\\JPMC\\DEV\\TMP\\ds\\data\\idea\\config\\IntelliJIdea2022.2\\scratches\\scratch_6.txt");
+            Scanner myReader = new Scanner(myObj);
+
+            while (myReader.hasNextLine()) {
+                String entry = myReader.nextLine();
+                System.out.println(entry);
+                String sensor = entry.split(": ")[0];
+                String beacon = entry.split(": ")[1];
+                int sensorX = Integer.parseInt(sensor.split(",")[0].split("Sensor at x=")[1]);
+                int sensorY = Integer.parseInt(sensor.split(",")[1].split("y=")[1]);
+                System.out.println(sensorX+","+sensorY);
+                int beaconX = Integer.parseInt(beacon.split(",")[0].split("closest beacon is at x=")[1]);
+                int beaconY = Integer.parseInt(beacon.split(",")[1].split("y=")[1]);
+                System.out.println(beaconX+","+beaconY);
+                Sensor newSensor = new Sensor();
+                newSensor.sensorX = sensorX;
+                newSensor.sensorY = sensorY;
+                newSensor.beaconX = beaconX;
+                newSensor.beaconY = beaconY;
+                sensors.add(newSensor);
+
+                int difX = newSensor.mahattanDistance();
+                int difY = newSensor.mahattanDistance();
+                if((sensorX - difX) < minX)
+                    minX = sensorX - difX ;
+                if((sensorX + difX) > maxX)
+                    maxX = sensorX + difX;
+                if((sensorY - difY) < minY)
+                    minY = sensorY - difY;
+                if((sensorY + difY) > maxY)
+                    maxY = sensorY + difY;
+                
+            }
+
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        System.out.println(minX+","+maxX+","+minY+","+maxY);
+        System.out.println("range: " + (maxX-minX) + ", " + (maxY - minY) );
+//        char[][] grid = new char[maxX-minX+1][];//[maxY-minY+1];
+//        for (int i = 0; i < maxX - minX; i++) {
+//            grid[i] = new char[maxY-minY+1];
+//            for (int j = 0; j < maxY - minY; j++) {
+//                grid[i][j] = '.';
+//            }
+//        }
+        char[] gridRow = new char[maxX-minX];
+        for (int i = 0; i < maxX - minX; i++) {
+            gridRow[i] = '.';
+        }
+
+        for (Sensor sensor:sensors
+             ) {
+            System.out.println(sensor.toString());
+            for (int i = sensor.sensorY - sensor.mahattanDistance(); i <=  sensor.sensorY + sensor.mahattanDistance() ; i++) {
+                if(i == ROW) {
+                    int xDirectionOffset = sensor.mahattanDistance() - Math.abs(sensor.sensorY - i);
+                    for (int j = sensor.sensorX - xDirectionOffset; j <= sensor.sensorX + xDirectionOffset; j++) {
+                        //System.out.print("("+j+","+i+")");
+
+                        if (gridRow[j - minX] == '.')
+                            gridRow[j - minX] = '#';
+                        //                    if(grid[j-minX][i-minY] == '.')
+                        //                        grid[j-minX][i-minY] = '#';
+                    }
+                    //System.out.println(i);
+                }
+            }
+            if(sensor.beaconY == ROW)
+                gridRow[sensor.beaconX-minX] = 'B';
+            if(sensor.sensorY == ROW)
+                gridRow[sensor.sensorX-minX] = 'S';
+//            grid[sensor.beaconX-minX][sensor.beaconY-minY] = 'B';
+//            grid[sensor.sensorX-minX][sensor.sensorY-minY] = 'S';
+        }
+
+
+//        for (int i = 0; i < maxY - minY; i++) {
+//            for (int j = 0; j < maxX -minX ; j++) {
+//                    System.out.print(grid[j][i]);
+//            }
+//            System.out.println();
+//
+//        }
+        int count = 0;
+        for (int i = 0; i < maxX -minX ; i++) {
+            //System.out.print(gridRow[i]);
+            if(gridRow[i] == '#')
+                count++;
+
+        }
+        System.out.println("Count: "+count);
+
+        List<Point> edges = new ArrayList<>();
+        for (Sensor sensor:sensors
+             ) {
+            edges.addAll(getEdges(sensor));
+        }
+        System.out.println(edges.size());
+//        List<Point> culledEdges = new ArrayList<>();
+//        for (Point edge:edges){
+//            culledEdges.add(edge);
+//        }
+//        System.out.println(culledEdges.toString());
+//        for (Point edge:edges
+//             ) {
+//            for (Sensor sensor:sensors
+//                 ) {
+//                if(!isEdge(edge,sensor))
+//                    culledEdges.remove(edge);
+//            }
+//        }
+        int countIter = 0;
+//        Iterator<Sensor> iter = sensors.iterator();
+//        while(iter.hasNext()){
+//            System.out.println(edges.size());
+            for (Sensor sensor:sensors) {
+                System.out.println(edges.size());
+                Iterator<Point> iter = edges.iterator();
+                while (iter.hasNext()) {
+                    if (!isEdge(iter.next(), sensor)) {
+                        iter.remove();
+                        break;
+                    }
+                }
+            }
+
+
+
+
+        System.out.println(edges.toString());
+
+    }
+    
+    public static class Sensor{
+        int sensorX = 0;
+        int sensorY = 0;
+        int beaconX = 0;
+        int beaconY = 0;
+
+        @Override
+        public String toString() {
+            return "Sensor{" + sensorX + "," + sensorY + "}, Beacon{" + beaconX + ","+ beaconY + "}";
+        }
+
+        public int mahattanDistance() {
+            return Math.abs(sensorX - beaconX) + Math.abs(sensorY - beaconY);
+        }
+    }
+
+    public static List<Point> getEdges(Sensor sensor){
+        int LIMIT = 4000000;
+        //int LIMIT = 20;
+        List<Point> edges = new ArrayList<>();
+
+        for (int i = sensor.sensorY - sensor.mahattanDistance(); i < sensor.sensorY + sensor.mahattanDistance() ; i++) {
+            int xDirectionOffset = sensor.mahattanDistance() - Math.abs(sensor.sensorY - i);
+            Point pL = new Point(sensor.sensorX - xDirectionOffset+1, i);
+            if(pL.x >= 0 && pL.x <= LIMIT && pL.y >= 0 && pL.y <= LIMIT )
+                edges.add(pL);
+            Point pR = new Point(sensor.sensorX + xDirectionOffset+1, i);
+            if(pR.x >= 0 && pR.x <= LIMIT && pR.y >= 0 && pR.y <= LIMIT )
+                edges.add(pR);
+        }
+        return edges;
+    }
+
+    public static boolean isEdge(Point pEdge, Sensor sensor){
+        for (int i = sensor.sensorY - sensor.mahattanDistance(); i < sensor.sensorY + sensor.mahattanDistance() ; i++) {
+           if(pEdge.y == i) {
+               int xDirectionOffset = sensor.mahattanDistance() - Math.abs(sensor.sensorY - i);
+               Point pL = new Point(sensor.sensorX - xDirectionOffset - 1, i);
+               Point pR = new Point(sensor.sensorX + xDirectionOffset + 1, i);
+               if (pEdge.x > pL.x && pEdge.x < pR.x)
+                   return false;
+           }
+        }
+        return true;
+    }
+
+    public static class Point {
+        int x = 0;
+        int y = 0;
+        Point(int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public String toString() {
+//            if(y == 10)
+                return "Point{" + "x=" + x + ", y=" + y + '}';
+//            else
+//                return "";
+        }
+    }
+
+}
