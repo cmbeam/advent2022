@@ -16,7 +16,7 @@ class Scratch {
         int minX = 0;
         int minY = 0;
         try {
-            File myObj = new File("C:\\JPMC\\DEV\\TMP\\ds\\data\\idea\\config\\IntelliJIdea2022.2\\scratches\\scratch_6.txt");
+            File myObj = new File("scratch_6.txt");
             Scanner myReader = new Scanner(myObj);
 
             while (myReader.hasNextLine()) {
