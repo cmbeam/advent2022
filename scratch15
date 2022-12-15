@@ -125,19 +125,24 @@ class Scratch {
         int countIter = 0;
         for(Point edge:edges)
         {
-            System.out.println((edges.size() - countIter++));
-            boolean edgeMatch = true;
-            for (Sensor sensor:sensors) {
-                if (!isEdge(edge, sensor)) {
-                    edgeMatch = false;
+//        for (int i = 0; i < 4000000 ; i++) {
+//            for (int j = 0; j < 4000000; j++) {
+
+                //Point edge = new Point(i, j);
+                System.out.println(countIter++);
+                boolean edgeMatch = true;
+                for (Sensor sensor : sensors) {
+                    if (!isEdge(edge, sensor)) {
+                        edgeMatch = false;
+                    }
+
+                }
+                if (edgeMatch) {
+                    System.out.println(edge.toString());
+                    break;
                 }
 
-            }
-            if(edgeMatch){
-                System.out.println(edge.toString());
-                break;
-            }
-
+         //   }
 
         }
 
@@ -185,12 +190,17 @@ class Scratch {
         public int mahattanDistance() {
             return Math.abs(sensorX - beaconX) + Math.abs(sensorY - beaconY);
         }
+
+        public int manhattanDistance(Point p){
+            return Math.abs(p.x - sensorX) + Math.abs(p.y - sensorY);
+        }
     }
 
     public static List<Point> getEdges(Sensor sensor){
         int LIMIT = 4000000;
         //int LIMIT = 20;
         List<Point> edges = new ArrayList<>();
+
 
         for (int i = sensor.sensorY - sensor.mahattanDistance(); i < sensor.sensorY + sensor.mahattanDistance() ; i++) {
             int xDirectionOffset = sensor.mahattanDistance() - Math.abs(sensor.sensorY - i);
@@ -205,15 +215,19 @@ class Scratch {
     }
 
     public static boolean isEdge(Point pEdge, Sensor sensor){
-        if(pEdge.y >= sensor.sensorY - sensor.mahattanDistance() && pEdge.y <= sensor.sensorY + sensor.mahattanDistance()) {
-            if (pEdge.x < (sensor.sensorX - (sensor.mahattanDistance() - Math.abs(pEdge.y - sensor.sensorY)))
-                    || pEdge.x > (sensor.sensorX + (sensor.mahattanDistance() - Math.abs(pEdge.y - sensor.sensorY))))
-                return true;
-            else
-                return false;
-        }
-        else
+        if(sensor.manhattanDistance(pEdge) > sensor.mahattanDistance())
             return true;
+        else
+            return false;
+//        if(pEdge.y >= sensor.sensorY - sensor.mahattanDistance() && pEdge.y <= sensor.sensorY + sensor.mahattanDistance()) {
+//            if (pEdge.x < (sensor.sensorX - (sensor.mahattanDistance() - Math.abs(pEdge.y - sensor.sensorY)))
+//                    || pEdge.x > (sensor.sensorX + (sensor.mahattanDistance() - Math.abs(pEdge.y - sensor.sensorY))))
+//                return true;
+//            else
+//                return false;
+//        }
+//        else
+//            return true;
 //        for (int i = sensor.sensorY - sensor.mahattanDistance(); i < sensor.sensorY + sensor.mahattanDistance() ; i++) {
 //           if(pEdge.y == i) {
 //               int xDirectionOffset = sensor.mahattanDistance() - Math.abs(sensor.sensorY - i);
