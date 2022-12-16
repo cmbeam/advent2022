@@ -1,0 +1,244 @@
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+class Scratch {
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(new Valve("ROOT", 0));
+        Valve valve = new Valve("AA", 0);
+        root.addChild(valve);
+        List<Valve> nonZeros = new ArrayList<>();
+        HashMap<String, Valve> valves = new HashMap<>();
+        try {
+            File myObj = new File("scratch_5.txt");
+            Scanner myReader = new Scanner(myObj);
+
+            while (myReader.hasNextLine()) {
+                String entry = myReader.nextLine();
+                Valve valve2 = new Valve(entry.split(";")[0].split(" ")[1], Integer.parseInt(entry.split(";")[0].split(" ")[4].split("=")[1]));
+                valves.put(valve2.name, valve2);
+                if (valve2.flowRate > 0 ){
+                    nonZeros.add(valve2);
+
+                }
+
+            }
+
+            myReader.close();
+            myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()){
+                String entry = myReader.nextLine();
+                String name = entry.split(";")[0].split(" ")[1];
+                String[] children = entry.split(";")[1].split("tunnel[s]* lead[s]* to valve[s]* ")[1].split(", ");
+                //set currentnode to the node with name
+                TreeNode node = root.findTreeNode(name);
+                for (String child:children
+                     ) {
+                    node.addChild(valves.get(child));
+                }
+
+            }
+
+
+        }
+        catch(Exception e){
+            System.out.println("Error" + e.getMessage());
+        }
+
+        System.out.println(valves.toString());
+
+        int total = 0;
+        int release = 0;
+        int timer = 30;
+        List<String> openValves = new ArrayList<>();
+        //walk tree
+        TreeNode currentNode = root.children.get(0);
+
+//        while(timer > 0){
+//            System.out.println("Timer: " + (30 - timer) + "  " + currentNode.data.name + "  ");
+//            timer--;
+//            total += release;
+//            System.out.println(printOpenFlowInfo(openValves) + " Release: " + release  + " Total: " + total );
+//            List<TreeNode> children = currentNode.children;
+//            TreeNode nodeToOpen = null;
+//            int greatestFlowRate = 0;
+//            for (TreeNode child:children
+//                 ) {
+//                if(child.data.flowRate >= currentNode.data.flowRate && child.data.flowRate >= greatestFlowRate) {
+//                    nodeToOpen = child;
+//                    greatestFlowRate = child.data.flowRate;
+//                }
+//            }
+//            if(nodeToOpen != null){
+//                System.out.println("Move " + nodeToOpen.data.name);
+//                currentNode = nodeToOpen;
+//            }
+//            else if(!openValves.contains(currentNode.data.name)){
+//                System.out.println("Open " + currentNode.data.name);
+//                openValves.add(currentNode.data.name);
+//                release += currentNode.data.flowRate;
+//                currentNode.data.flowRate = 0;
+//            }
+//
+//        }
+
+        while(nonZeros.size() > 0 && timer > 0) {
+            total = total + release;
+            int weight = 0;
+            Valve winner = null;
+            for (Valve vertex:nonZeros
+                 ) {
+                HashMap<String, Integer> distances = new HashMap<>();
+                distances.put(currentNode.data.name, 1000000000);
+                int dist = distance(currentNode, vertex, distances);
+                System.out.println("Weight " + vertex.name + " " + dist + " " + routeWeight(vertex, dist, timer) );
+                if(routeWeight(vertex, dist, timer) > weight){
+                    weight = routeWeight(vertex, dist, timer);
+                    winner = vertex;
+                }
+            }
+            release += winner.flowRate;
+            winner.flowRate = 0;
+            nonZeros.remove(winner);
+            //goto winner in nodeTree
+            currentNode = currentNode.findTreeNode(winner.name);
+            System.out.println(currentNode.data.name);
+            
+
+        }
+        System.out.println(nonZeros.size());
+
+    }
+
+public static int distance(TreeNode start, Valve end, HashMap<String, Integer> distances ){
+//        for (TreeNode child:start.children
+//         ) {
+//        if (start.isChild(end.name)) {
+//            return 1;
+//        } else if (!distances.containsKey(child.data.name)) {
+//            distances.put(child.data.name, 1 + distance(child, end, distances));
+//        }
+    return findLevel(start, end.name, 0);
+    }
+//
+//    int shortest = 1000000;
+//    for (Map.Entry<String, Integer> distance:distances.entrySet()) {
+//        if(distance.getValue() < shortest)
+//            shortest = distance.getValue();
+//    }
+//
+//        return shortest;
+//}
+
+    static int findLevel(TreeNode root, String name,
+            int level)
+    {
+
+        // Base Case
+        if ( level > 10)
+        {
+            return -1;
+        }
+
+        // If key is present at root, or in left
+        // subtree or right subtree, return true;
+        if (root.data.name.equals(name))
+        {
+            return level;
+        }
+
+        int low = 1000000;
+        for(TreeNode child : root.children){
+            int l = findLevel(child, name, level + 1);
+            if(l < low )
+                low = l;
+        }
+        return low;
+    }
+
+public static int routeWeight(Valve end, int distance, int timer){
+        //find the shortest path bewteen start and end using recursion
+        //return: weight = end.flow / (distance + 1)
+        return end.flowRate * (timer - distance - 1);
+}
+
+public static String printOpenFlowInfo(List<String> openValves){
+    StringBuffer sb = new StringBuffer("Open valves: ");
+    for (String valve:openValves
+         ) {
+        sb.append(", " + valve);
+    }
+    return sb.toString();
+}
+public static  class Valve {
+    String name = "";
+    int flowRate = 0;
+    public Valve(String n, int r){
+        this.flowRate = r;
+        this.name = n;
+    }
+
+    @Override
+    public String toString() {
+        return "Valve{" + "name='" + name + '\'' + ", flowRate=" + flowRate + '}';
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+public static class TreeNode implements Iterable<TreeNode> {
+
+    Scratch.Valve data;
+    TreeNode parent;
+    List<TreeNode> children;
+
+    private List<TreeNode> elementsIndex;
+
+    public TreeNode(Scratch.Valve data) {
+        this.data = data;
+        this.children = new LinkedList<>();
+        this.elementsIndex = new LinkedList<TreeNode>();
+    }
+
+    public TreeNode addChild(Scratch.Valve child) {
+        TreeNode childNode = new TreeNode(child);
+        childNode.parent = this;
+        this.children.add(childNode);
+        this.registerChildForSearch(childNode);
+        return childNode;
+    }
+
+    private void registerChildForSearch(TreeNode node) {
+        elementsIndex.add(node);
+        if (parent != null)
+            parent.registerChildForSearch(node);
+    }
+
+    public TreeNode findTreeNode(String name) {
+        for (TreeNode element : this.elementsIndex) {
+            Scratch.Valve elData = element.data;
+            if (elData.getName().equals(name))
+                return element;
+        }
+
+        return null;
+    }
+    public boolean isChild(String name) {
+        for (TreeNode child : this.children){
+            if(child.data.name.equals(name))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Iterator<TreeNode> iterator() {
+        return null;
+    }
+}}
